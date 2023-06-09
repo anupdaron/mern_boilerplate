@@ -3,6 +3,7 @@ const mongoose = require("mongoose");
 class Service {
   constructor(model) {
     this.model = model;
+    this.getById = this.getById.bind(this);
     this.getAll = this.getAll.bind(this);
     this.insert = this.insert.bind(this);
     this.update = this.update.bind(this);
@@ -44,8 +45,31 @@ class Service {
       };
     }
   }
+  async getById(id) {
+    try {
+      let item = await this.model.findById(id);
+      if (!item)
+        return {
+          error: true,
+          statusCode: 404,
+          message: "item not found",
+        };
+      return {
+        error: false,
+        statusCode: 200,
+        item,
+      };
+    } catch (error) {
+      return {
+        error: true,
+        statusCode: 500,
+        error,
+      };
+    }
+  }
 
   async insert(data) {
+    console.log(this.model);
     try {
       let item = await this.model.create(data);
       if (item)
